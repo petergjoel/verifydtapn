@@ -23,27 +23,27 @@ namespace TAPN {
         }
 
         for (auto* arc : inputArcs) {
-            arc->getOutputTransition().addToPreset(*arc);
-            arc->getInputPlace().addInputArc(*arc);
+            arc->getOutputTransition().addToPreset(arc);
+            arc->getInputPlace().addInputArc(arc);
             updateMaxConstant(arc->getInterval());
         }
 
         for (auto* arc : transportArcs) {
-            arc->getTransition().addTransportArcGoingThrough(*arc);
-            arc->getSource().addTransportArc(*arc);
-            arc->getDestination().addProdTransportArc(*arc);
+            arc->getTransition().addTransportArcGoingThrough(arc);
+            arc->getSource().addTransportArc(arc);
+            arc->getDestination().addProdTransportArc(arc);
             updateMaxConstant(arc->getInterval());
         }
 
         for (auto* arc : inhibitorArcs) {
-            arc->getOutputTransition().addIncomingInhibitorArc(*arc);
-            arc->getInputPlace().addInhibitorArc(*arc);
+            arc->getOutputTransition().addIncomingInhibitorArc(arc);
+            arc->getInputPlace().addInhibitorArc(arc);
             arc->getInputPlace().setHasInhibitorArcs(true);
         }
-
+        
         for (auto* arc : outputArcs) {
-            arc->getInputTransition().addToPostset(*arc);
-            arc->getOutputPlace().addOutputArc(*arc);
+            arc->getInputTransition().addToPostset(arc);
+            arc->getOutputPlace().addOutputArc(arc);
         }
 
 

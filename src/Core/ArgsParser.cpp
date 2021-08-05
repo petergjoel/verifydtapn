@@ -22,6 +22,7 @@ namespace VerifyTAPN {
     static const std::string CALCULATE_CMAX = "calculate-cmax";
     static const std::string REPLACE = "replace";
     static const std::string ORDER = "partial-order";
+    static const std::string STRATEGY_OUT = "strategy-output";
 
     std::ostream &operator<<(std::ostream &out, const Switch &flag) {
         flag.print(out);
@@ -183,6 +184,9 @@ namespace VerifyTAPN {
                 new Switch("i", ORDER,
                            "Disable partial order reduction"));
 
+        parsers.push_back(
+                new SwitchWithStringArg("z", STRATEGY_OUT,
+                           "File to write synthesized strategy to, use '_' (an underscore) for stdout", ""));
     }
 
     void ArgsParser::printHelp() const {
@@ -494,9 +498,12 @@ namespace VerifyTAPN {
         bool order = boost::lexical_cast<bool>(
                 map.find(ORDER)->second);
 
+
+        std::string output = map.find(STRATEGY_OUT)->second;
+
         return VerificationOptions(search, verification, memoptimization, kbound, trace,
                                    xml_trace, max_constant, keep_dead, enableGCDLowerGuards, workflow,
-                                   workflowBound, calculateCmax, replace, !order);
+                                   workflowBound, calculateCmax, replace, !order, output);
 
     }
 }

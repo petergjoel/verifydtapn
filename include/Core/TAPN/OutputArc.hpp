@@ -26,12 +26,12 @@ namespace VerifyTAPN { namespace TAPN {
     public: // inspectors
         void print(std::ostream &out) const;
 
-        inline int getWeight() const { return weight; }
+        inline uint32_t getWeight() const { return weight; }
 
     private:
         TimedTransition &transition;
         TimedPlace &place;
-        const int weight;
+        const uint32_t weight;
     };
 
     inline std::ostream &operator<<(std::ostream &out, const OutputArc &arc) {

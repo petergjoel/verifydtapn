@@ -31,6 +31,18 @@ namespace VerifyTAPN { namespace DiscreteVerification {
             virtual ~Pointer() = default;
         };
 
+        /*
+         * inheritance model makes it dificult to follow std pointer types
+         * so we build our own simple version
+         */
+        class Iterator {
+        public:
+            virtual ~Iterator() = default;
+            virtual void next() = 0;
+            virtual bool done() = 0;
+            virtual Pointer* operator*() const = 0;
+        };
+
         typedef std::pair<bool, Pointer *> result_t;
 
         /**
@@ -88,6 +100,8 @@ namespace VerifyTAPN { namespace DiscreteVerification {
 
         virtual
         void set_meta(Pointer *p, T &meta) = 0;
+        
+        virtual Iterator* begin() const = 0;
     };
 } }
 #endif    /* MARKINGSTORE_H */

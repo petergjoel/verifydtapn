@@ -42,6 +42,7 @@ namespace VerifyTAPN { namespace DiscreteVerification {
         struct SafetyMeta {
             uint8_t state;
             bool waiting;                       // We only need stuff on waiting once
+            bool printed = false;
             size_t ctrl_children;                // Usefull.
             size_t env_children;
             depends_t dependers;                // A punch of parents
@@ -55,7 +56,7 @@ namespace VerifyTAPN { namespace DiscreteVerification {
         AST::Query *query;
         VerificationOptions options;
         std::vector<int> placeStats;
-        GameGenerator generator;
+        std::unique_ptr<GameGenerator> generator;
         size_t discovered;
         size_t explored;
         unsigned int largest;
@@ -73,14 +74,22 @@ namespace VerifyTAPN { namespace DiscreteVerification {
         unsigned int max_tokens() { return largest; };
 
         void print_stats();
+        
+        void write_strategy(std::ostream& out);
 
     private:
         bool satisfies_query(NonStrictMarkingBase *m);
 
-        void successors(MarkingStore<SafetyMeta>::Pointer *, SafetyMeta &,
-                        waiting_t &waiting, bool controller, const Query* query);
+        std::vector<store_t::Pointer*> successors(MarkingStore<SafetyMeta>::Pointer *, SafetyMeta &, bool controller, const Query* query);
 
         void dependers_to_waiting(SafetyMeta &next_meta, backstack_t &waiting);
+        void add_successors(store_t::Pointer *parent, SafetyMeta &meta, const std::vector<store_t::Pointer*>& successors, bool is_controller);
+        
+        bool done() const {
+            return waiting->empty();
+        }
+        
+        store_t::Pointer* pop_waiting();
     };
 } }
 

@@ -34,7 +34,7 @@ namespace VerifyTAPN { namespace TAPN {
     public: // Inspectors
         void print(std::ostream &out) const;
 
-        inline const int getWeight() const { return weight; }
+        uint32_t getWeight() const { return weight; }
 
     private:
         TimeInterval interval;

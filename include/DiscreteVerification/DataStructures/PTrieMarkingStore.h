@@ -17,9 +17,30 @@
 namespace VerifyTAPN { namespace DiscreteVerification {
     template<typename T = MetaData *>
     class PTrieMarkingStore : public MarkingStore<T> {
-    public:
-
     protected:
+        class Iterator : public MarkingStore<T>::Iterator {
+        private:
+            const ptrie_t<T>& map;
+            size_t id;
+        public:
+            Iterator(const ptrie_t<T>& map, size_t id) : map(map), id(id) {
+            }
+            
+            virtual void next() {
+                ++id;
+            }
+            
+            virtual bool done() {
+                return id >= map.size();
+            }
+            
+            virtual typename MarkingStore<T>::Pointer* operator*() const
+            {
+                return reinterpret_cast<typename MarkingStore<T>::Pointer*>(id);
+            }
+            
+        };
+        
         MarkingEncoder<T, NonStrictMarkingBase> encoder;
         ptrie_t<T> store;
     public:
@@ -90,6 +111,10 @@ namespace VerifyTAPN { namespace DiscreteVerification {
             pointer.set_meta(meta);
         }
 
+        virtual typename MarkingStore<T>::Iterator* begin() const override {
+            return new Iterator(store, 0);
+        }
+        
     };
 } }
 

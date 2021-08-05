@@ -53,10 +53,41 @@ namespace VerifyTAPN { namespace DiscreteVerification {
 
     protected:
         // We are just saving a bunch of pointers
-        typedef std::vector<Pointer *> pointer_list;
+        using pointer_list = std::vector<Pointer *>;
 
         // set is unordered version of map. Fine for this, we need no ordering.
-        typedef google::sparse_hash_map<size_t, pointer_list> map_t;
+        using map_t = google::sparse_hash_map<size_t, pointer_list>;
+        
+    private:
+        class Iterator : public MarkingStore<T>::Iterator {
+        private:
+            const map_t& map;
+            typename map_t::const_iterator mit;
+            typename pointer_list::const_iterator lit;
+        public:
+            Iterator(const map_t& map, typename map_t::const_iterator mit) : map(map), mit(mit) {}
+            
+            virtual void next() {
+                ++lit;
+                if(lit == mit->second.end())
+                {
+                    ++mit;
+                    if(mit != map.end())
+                        lit = mit->second.begin();
+                }
+            }
+            
+            virtual bool done() {
+                return mit == map.end();
+            }
+
+            virtual typename MarkingStore<T>::Pointer* operator*() const
+            {
+                return *lit;
+            }
+            
+        };
+
 
         map_t store;
     public:
@@ -141,6 +172,10 @@ namespace VerifyTAPN { namespace DiscreteVerification {
         virtual
         void set_meta(typename MarkingStore<T>::Pointer *p, T &meta) {
             static_cast<Pointer *>(p)->set_meta_data(meta);
+        }
+        
+        virtual typename MarkingStore<T>::Iterator* begin() const override {
+            return new Iterator(store, store.begin());
         }
     };
 } }

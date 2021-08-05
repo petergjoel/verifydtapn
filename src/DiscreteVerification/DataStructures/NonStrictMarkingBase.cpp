@@ -298,7 +298,7 @@ namespace VerifyTAPN { namespace DiscreteVerification {
                 hasOutArc = true;
                 auto id = arc->getTransition().getIndex();
                 int weight = arc->getWeight();
-                if (numtokens < arc->getWeight())
+                if (numtokens < (int)arc->getWeight())
                     status[id] = -1; // impossible to enable
                 else if (status[id] != -1) { // if enable able so far
                     auto lb = arc->getInterval().getLowerBound();

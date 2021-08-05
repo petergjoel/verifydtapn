@@ -61,7 +61,15 @@ public:
             _front = _back = 0;
         }
     }
+    
+    const T* begin() const {
+        return &_data[_front];
+    }
 
+    const T* end() const {
+        return &_data[_back];
+    }
+    
     void clear() {
         _front = _back = 0;
     }

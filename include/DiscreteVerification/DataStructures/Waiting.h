@@ -32,6 +32,8 @@ namespace VerifyTAPN { namespace DiscreteVerification {
 
         virtual
         bool empty() = 0;
+        
+        virtual ~weightedqueue_t() = default;
     };
 
 

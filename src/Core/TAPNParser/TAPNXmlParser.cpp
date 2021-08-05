@@ -170,111 +170,99 @@ namespace VerifyTAPN {
         return outputArcs;
     }
 
+    TimedPlace* find_place(const TimedPlace::Vector &places, const char* pid) {
+        for(auto* p : places)
+            if(p->getName().compare(pid) == 0)
+                return p;
+        std::cerr << "Could not find place \"" << pid << "\". It must be defined before use." << std::endl;
+        exit(-1);
+        return nullptr;
+    }
+
+    TimedTransition* find_transition(const TimedTransition::Vector& transitions, const char* tid) {
+        for(auto* t : transitions)
+            if(t->getName().compare(tid) == 0)
+                return t;
+        std::cerr << "Could not find transition \"" << tid << "\". It must be defined before use." << std::endl;
+        exit(-1);
+        return nullptr;
+    }
+
     TimedInputArc *TAPNXmlParser::parseInputArc(const rapidxml::xml_node<> &arcNode, const TimedPlace::Vector &places,
                                                 const TimedTransition::Vector &transitions) const {
-        std::string source = arcNode.first_attribute("source")->value();
-        std::string target = arcNode.first_attribute("target")->value();
-        std::string interval = arcNode.first_attribute("inscription")->value();
+        auto* source = arcNode.first_attribute("source")->value();
+        auto* target = arcNode.first_attribute("target")->value();
+        TimeInterval tint;
+        if(auto ins = arcNode.first_attribute("inscription"))
+        {
+            std::string interval;
+            interval = ins->value();
+            tint = TimeInterval::createFor(interval, replace);
+        }
 
         int weight = getWeight(arcNode.first_attribute("weight"));
 
-        TimedPlace::Vector::const_iterator place = places.begin();
-        while (place != places.end()) {
-            if ((*place)->getId() == source) break;
-            ++place;
-        }
+        auto* place = find_place(places, source);
+        auto* transition = find_transition(transitions, target);
 
-        TimedTransition::Vector::const_iterator transition = transitions.begin();
-        while (transition != transitions.end()) {
-            if ((*transition)->getId() == target) break;
-            ++transition;
-        }
-
-        return new TimedInputArc(**place, **transition, weight, TimeInterval::createFor(interval, replace));
+        return new TimedInputArc(*place, *transition, weight, tint);
     }
 
     TransportArc *
     TAPNXmlParser::parseTransportArc(const rapidxml::xml_node<> &arcNode, const TimedPlace::Vector &places,
                                      const TimedTransition::Vector &transitions) const {
-        std::string sourceName = arcNode.first_attribute("source")->value();
-        std::string transitionName = arcNode.first_attribute("transition")->value();
-        std::string targetName = arcNode.first_attribute("target")->value();
-        std::string interval = arcNode.first_attribute("inscription")->value();
+        auto* sourceName = arcNode.first_attribute("source")->value();
+        auto* transitionName = arcNode.first_attribute("transition")->value();
+        auto* targetName = arcNode.first_attribute("target")->value();
+        std::string interval;
+        TimeInterval tint;
+        if(auto ins = arcNode.first_attribute("inscription"))
+        {
+            interval = ins->value();
+            tint = TimeInterval::createFor(interval, replace);
+        }
 
         int weight = getWeight(arcNode.first_attribute("weight"));
 
-        TimedPlace::Vector::const_iterator source = places.begin();
-        while (source != places.end()) {
-            if ((*source)->getId() == sourceName) break;
-            ++source;
-        }
+        auto* source = find_place(places, sourceName);
+        auto* transition = find_transition(transitions, transitionName);
+        auto* target = find_place(places, targetName);
 
-        TimedTransition::Vector::const_iterator transition = transitions.begin();
-        while (transition != transitions.end()) {
-            if ((*transition)->getId() == transitionName) break;
-            ++transition;
-        }
-
-        TimedPlace::Vector::const_iterator target = places.begin();
-        while (target != places.end()) {
-            if ((*target)->getId() == targetName) break;
-            ++target;
-        }
-
-        TimeInterval tint = TimeInterval::createFor(interval, replace);
-        if (!tint.setUpperBound((*target)->getInvariant().getBound(),
-                                (*target)->getInvariant().isBoundStrict())) {
-            std::cout << "Invariant on " << (*target)->getName() <<
+        if (!tint.setUpperBound(target->getInvariant().getBound(),
+                                target->getInvariant().isBoundStrict())) {
+            std::cout << "Invariant on " << target->getName() <<
                       " makes the guard " << interval <<
                       " unsatisfiable for transport arc of transition "
-                      << (*transition)->getName() << std::endl;
+                      << transition->getName() << std::endl;
         }
-        return new TransportArc(**source, **transition, **target, tint, weight);
+        return new TransportArc(*source, *transition, *target, tint, weight);
     }
 
     InhibitorArc *
     TAPNXmlParser::parseInhibitorArc(const rapidxml::xml_node<> &arcNode, const TimedPlace::Vector &places,
                                      const TimedTransition::Vector &transitions) const {
-        std::string source = arcNode.first_attribute("source")->value();
-        std::string target = arcNode.first_attribute("target")->value();
+        auto* source = arcNode.first_attribute("source")->value();
+        auto* target = arcNode.first_attribute("target")->value();
 
         int weight = getWeight(arcNode.first_attribute("weight"));
 
-        TimedPlace::Vector::const_iterator place = places.begin();
-        while (place != places.end()) {
-            if ((*place)->getId() == source) break;
-            ++place;
-        }
+        auto* place = find_place(places, source);
+        auto* transition = find_transition(transitions, target);
 
-        TimedTransition::Vector::const_iterator transition = transitions.begin();
-        while (transition != transitions.end()) {
-            if ((*transition)->getId() == target) break;
-            ++transition;
-        }
-
-        return new InhibitorArc(**place, **transition, weight);
+        return new InhibitorArc(*place, *transition, weight);
     }
 
     OutputArc *TAPNXmlParser::parseOutputArc(const rapidxml::xml_node<> &arcNode, const TimedPlace::Vector &places,
                                              const TimedTransition::Vector &transitions) const {
-        std::string source = arcNode.first_attribute("source")->value();
-        std::string target = arcNode.first_attribute("target")->value();
+        auto* source = arcNode.first_attribute("source")->value();
+        auto* target = arcNode.first_attribute("target")->value();
 
         int weight = getWeight(arcNode.first_attribute("weight"));
 
-        TimedTransition::Vector::const_iterator transition = transitions.begin();
-        while (transition != transitions.end()) {
-            if ((*transition)->getId() == source) break;
-            ++transition;
-        }
+        auto* transition = find_transition(transitions, source);
+        auto* place = find_place(places, target);
 
-        TimedPlace::Vector::const_iterator place = places.begin();
-        while (place != places.end()) {
-            if ((*place)->getId() == target) break;
-            ++place;
-        }
-
-        return new OutputArc(**transition, **place, weight);
+        return new OutputArc(*transition, *place, weight);
 
     }
 
@@ -284,7 +272,10 @@ namespace VerifyTAPN {
         xml_node<> *placeNode = root.first_node("place");
         int totalInitTokens = 0;
         while (placeNode != nullptr) {
-            std::string initialMarkingValue = placeNode->first_attribute("initialMarking")->value();
+            std::string initialMarkingValue = "0";
+            if(auto init = placeNode->first_attribute("initialMarking"))
+                initialMarkingValue = init->value();
+            
             std::string placeName(placeNode->first_attribute("name")->value());
 
             boost::algorithm::trim(initialMarkingValue);

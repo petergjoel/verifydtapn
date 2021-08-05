@@ -31,13 +31,13 @@ namespace VerifyTAPN {
             virtual ~TimedTransition() { /* empty */ }
 
         public: // modifiers
-            void addToPreset(TimedInputArc &arc);
+            void addToPreset(TimedInputArc* arc);
 
-            void addToPostset(OutputArc &arc);
+            void addToPostset(OutputArc* arc);
 
-            void addTransportArcGoingThrough(TransportArc &arc);
+            void addTransportArcGoingThrough(TransportArc* arc);
 
-            void addIncomingInhibitorArc(InhibitorArc &arc);
+            void addIncomingInhibitorArc(InhibitorArc* arc);
 
             inline void setIndex(int i) { index = i; };
         public: // inspectors
@@ -47,23 +47,15 @@ namespace VerifyTAPN {
 
             void print(std::ostream &) const;
 
-            inline TimedInputArc::Vector &getPreset() { return preset; }
-
             const inline TimedInputArc::Vector &getPreset() const { return preset; }
 
-            inline TransportArc::Vector &getTransportArcs() { return transportArcs; }
-
             const inline TransportArc::Vector &getTransportArcs() const { return transportArcs; }
-
-            inline InhibitorArc::Vector &getInhibitorArcs() { return inhibitorArcs; }
 
             const inline InhibitorArc::Vector &getInhibitorArcs() const { return inhibitorArcs; }
 
             inline unsigned int getPresetSize() const {
                 return getNumberOfInputArcs() + getNumberOfTransportArcs();
             }
-
-            inline OutputArc::Vector &getPostset() { return postset; }
 
             const inline OutputArc::Vector &getPostset() const { return postset; }
 
@@ -88,12 +80,16 @@ namespace VerifyTAPN {
             inline bool isControllable() const {
                 return controllable;
             }
+            
+            inline bool isEnvironment() const {
+                return !isControllable();
+            }
 
             inline void setControllable(bool value) {
                 controllable = value;
             }
 
-            uint32_t getProduced(TimedPlace* place) const
+            uint32_t getProduced(const TimedPlace* place) const
             {
                 // this could be precomputed
                 for(auto& pre : getPostset())
@@ -105,7 +101,7 @@ namespace VerifyTAPN {
                 return 0;
             }
             
-            uint32_t getConsumed(TimedPlace* place) const
+            uint32_t getConsumed(const TimedPlace* place) const
             {
                 // this could be precomputed
                 for(auto& pre : getPreset())

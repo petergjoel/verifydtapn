@@ -10,6 +10,8 @@
 #include "DiscreteVerification/VerificationTypes/SafetySynthesis.h"
 #include "DiscreteVerification/Generators/ReducingGenerator.hpp"
 
+#include <fstream>
+
 namespace VerifyTAPN { namespace DiscreteVerification {
 
     template<typename T>
@@ -166,6 +168,15 @@ namespace VerifyTAPN { namespace DiscreteVerification {
             );
             bool result = synthesis.run();
             synthesis.print_stats();
+            if(!options.getStrategyFile().empty()) {
+                if(options.getStrategyFile() == "_")
+                    synthesis.write_strategy(std::cout);
+                else
+                {
+                    std::ofstream of(options.getStrategyFile());
+                    synthesis.write_strategy(of);
+                }
+            }
 
             if (query->getQuantifier() == AST::EF || query->getQuantifier() == AST::AF) result = !result;
 

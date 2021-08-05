@@ -30,7 +30,7 @@ namespace TAPN {
                          TransportArc::Vector &transportArcs,
                          InhibitorArc::Vector &inhibitorArcs)
                 : places(places), transitions(transitions), inputArcs(inputArcs), outputArcs(outputArcs),
-                  transportArcs(transportArcs), inhibitorArcs(inhibitorArcs), maxConstant(0), gcd(1) {};
+                  transportArcs(transportArcs), inhibitorArcs(inhibitorArcs) {};
 
         ~TimedArcPetriNet() {
             // call delete on all data
@@ -108,8 +108,8 @@ namespace TAPN {
         OutputArc::Vector outputArcs;
         TransportArc::Vector transportArcs;
         InhibitorArc::Vector inhibitorArcs;
-        int maxConstant;
-        int gcd;
+        int maxConstant = 0;
+        int gcd = 1;
     };
 
     inline std::ostream &operator<<(std::ostream &out, const VerifyTAPN::TAPN::TimedArcPetriNet &tapn) {

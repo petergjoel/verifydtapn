@@ -123,6 +123,8 @@ namespace VerifyTAPN {
 
         std::map<std::string, int> parseReplace(const option &option) const;
 
+        std::set<size_t> extractValues(const option &option) const;
+
         void initialize();
 
         void printHelp() const;

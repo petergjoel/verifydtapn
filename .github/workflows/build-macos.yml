@@ -41,6 +41,9 @@ jobs:
         cmakeBuildType: Release
         cmakeGenerator: UnixMakefiles
         buildDirectory: '${{runner.workspace}}/build'     
+      env:
+        CC: gcc-9
+        CXX: g++-9
     
     - name: Upload artifacts 
       uses: actions/upload-artifact@v2

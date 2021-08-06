@@ -8,7 +8,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    if (NOT APPLE)
+    	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif ()
 endif ()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -44,11 +46,15 @@ if (UNIX AND NOT APPLE)
     set(ARCH_TYPE "linux64")
 elseif (APPLE)
     set(ARCH_TYPE "osx64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.9 -m64 ")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -dynamic -mmacosx-version-min=10.9 -std=c++14 -m64 ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=11.2 -m64 ")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -dynamic -mmacosx-version-min=11.2 -std=c++14 -m64 ")
 else ()
     set(ARCH_TYPE "win64")
 endif ()
+
+
+find_package(FLEX 2.6.0 REQUIRED)
+find_package(BISON 3.5.0 REQUIRED)
 
 if (VERIFYDTAPN_GetDependencies)
     # setup for external imports
@@ -62,7 +68,14 @@ if (VERIFYDTAPN_GetDependencies)
             CONFIGURE_COMMAND mkdir -p ${CMAKE_BINARY_DIR}/external/include
             INSTALL_COMMAND cd ../rapidxml-ext && ${CMAKE_COMMAND} -E copy rapidxml.hpp rapidxml_iterators.hpp rapidxml_print.hpp rapidxml_utils.hpp ${EXTERNAL_INSTALL_LOCATION}/include
             )
+
+    ExternalProject_add(unfoldtacpn-ext 
+        GIT_REPOSITORY https://github.com/TAPAAL/unfoldTACPN.git
+        GIT_TAG main 
+	CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}  -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION} -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DFLEX_EXECUTABLE=${FLEX_EXECUTABLE} -DBISON_EXECUTABLE=${BISON_EXECUTABLE}
+    )
     include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
+
 endif (VERIFYDTAPN_GetDependencies)
 
 set(Boost_USE_STATIC_LIBS ON)

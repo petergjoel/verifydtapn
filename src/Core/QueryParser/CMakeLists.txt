@@ -1,7 +1,4 @@
 
-find_package(FLEX 2.6.0 REQUIRED)
-find_package(BISON 3.5.0 REQUIRED)
-
 flex_target(lexer "${CMAKE_CURRENT_SOURCE_DIR}/flex.ll"
         "${CMAKE_CURRENT_SOURCE_DIR}/Lexer.cpp")
 

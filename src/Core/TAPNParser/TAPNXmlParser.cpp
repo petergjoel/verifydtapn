@@ -12,6 +12,7 @@ namespace VerifyTAPN {
 
     TimedArcPetriNet *TAPNXmlParser::parse(const std::string &filename) const {
         const std::string contents = VerifyTAPN::readFile(filename);
+        std::cout << "empty? " << contents << std::endl;
         std::vector<char> charArray(contents.begin(), contents.end());
         charArray.push_back('\0');
 

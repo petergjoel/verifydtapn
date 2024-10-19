@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         of.close();
     }
 
-    tapn->initialize(options.getGlobalMaxConstantsEnabled(), options.getGCDLowerGuardsEnabled());
+    tapn->initialize(options);
 
     if (options.getCalculateCmax()) {
         std::cout << options << std::endl;

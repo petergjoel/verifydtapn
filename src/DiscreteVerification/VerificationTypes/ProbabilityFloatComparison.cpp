@@ -14,7 +14,7 @@ ProbabilityFloatComparison::ProbabilityFloatComparison(
     computeIndifferenceRegion(smcSettings.geqThan, smcSettings.indifferenceRegionUp, smcSettings.indifferenceRegionDown);
 }
 
-void ProbabilityFloatComparison::handleRunResult(const bool res, int steps, double delay) {
+void ProbabilityFloatComparison::handleRunResult(const bool res, int steps, double delay, unsigned int thread_id) {
     bool valid = query->getQuantifier() == PG ? !res : res;
     if(p0 >= 1.0f && !valid) {
         ratio = std::numeric_limits<float>::infinity();

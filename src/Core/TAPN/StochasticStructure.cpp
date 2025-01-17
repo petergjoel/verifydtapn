@@ -20,6 +20,10 @@ namespace VerifyTAPN::SMC {
                 return "discrete uniform";
             case Geometric:
                 return "geometric";
+            case Triangular:
+                return "triangular";
+            case LogNormal:
+                return "log normal";
         }
         return "";
     }
@@ -46,35 +50,44 @@ namespace VerifyTAPN::SMC {
         params.constant.value = 1;
         return Distribution { Constant, params };
     }
-    Distribution Distribution::fromParams(int distrib_id, double param1, double param2) {
+    Distribution Distribution::fromParams(int distrib_id, std::vector<double> raw_params) {
         DistributionType distrib = static_cast<DistributionType>(distrib_id);
         DistributionParameters params;
         switch(distrib){
             case Constant:
-                params.constant.value = param1;
+                params.constant.value = raw_params[0];
                 break; 
             case Uniform:
-                params.uniform.a = param1;
-                params.uniform.b = param2;
+                params.uniform.a = raw_params[0];
+                params.uniform.b = raw_params[1];
                 break;
             case Exponential:
-                params.exp.rate = param1;
+                params.exp.rate = raw_params[0];
                 break;
             case Normal:
-                params.normal.mean = param1;
-                params.normal.stddev = param2;
+                params.normal.mean = raw_params[0];
+                params.normal.stddev = raw_params[1];
                 break;
             case Gamma:
             case Erlang:
-                params.gamma.shape = param1;
-                params.gamma.scale = param2;
+                params.gamma.shape = raw_params[0];
+                params.gamma.scale = raw_params[1];
                 break;
             case DiscreteUniform:
-                params.discreteUniform.a = (int) param1;
-                params.discreteUniform.b = (int) param2;
+                params.discreteUniform.a = (int) raw_params[0];
+                params.discreteUniform.b = (int) raw_params[1];
                 break;
             case Geometric:
-                params.geometric.p = param1;
+                params.geometric.p = raw_params[0];
+                break;
+            case Triangular:
+                params.triangular.a = raw_params[0];
+                params.triangular.b = raw_params[1];
+                params.triangular.c = raw_params[2];
+                break;
+            case LogNormal:
+                params.logNormal.logMean = raw_params[0];
+                params.logNormal.logStddev = raw_params[1];
                 break;
             default:
                 break;
@@ -112,6 +125,15 @@ namespace VerifyTAPN::SMC {
                 break;
             case Geometric:
                 res << "p=\"" << parameters.geometric.p << endField;
+                break;
+            case Triangular:
+                res << "a=\"" << parameters.triangular.a << endField;
+                res << "b=\"" << parameters.triangular.b << endField;
+                res << "c=\"" << parameters.triangular.c << endField;
+                break;
+            case LogNormal:
+                res << "logMean=\"" << parameters.logNormal.logMean << endField;
+                res << "logStddev=\"" << parameters.logNormal.logStddev << endField;
                 break;
         }
         return res.str();

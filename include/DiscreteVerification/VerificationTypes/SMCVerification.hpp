@@ -5,6 +5,7 @@
 #include "DiscreteVerification/DataStructures/NonStrictMarking.hpp"
 #include "DiscreteVerification/Generators/SMCRunGenerator.h"
 #include "Core/Query/SMCQuery.hpp"
+#include "Core/TAPN/WatchExpression.hpp"
 
 #include <mutex>
 
@@ -36,14 +37,18 @@ class SMCVerification : public Verification<RealMarking> {
 
         virtual bool reachedRunBound(SMCRunGenerator* generator = nullptr);
         
-        virtual void handleRunResult(const bool res, int steps, double delay) = 0;
+        virtual void handleRunResult(const bool res, int steps, double delay, unsigned int thread_id = 0) = 0;
         virtual bool mustDoAnotherRun() = 0;
 
         virtual void printResult() = 0;
 
         inline bool mustSaveTrace() const { return traces.size() < options.getSmcTraces(); }
-        void handleTrace(const bool runRes, SMCRunGenerator* generator = nullptr);
+        virtual void handleTrace(const bool runRes, SMCRunGenerator* generator = nullptr);
         void saveTrace(SMCRunGenerator* generator = nullptr);
+
+        virtual void initWatchs(unsigned int n_threads = 1);
+
+        SMCQuery* getSmcQuery() { return (SMCQuery*) query; }
 
         void getTrace() override;
 
@@ -73,6 +78,9 @@ class SMCVerification : public Verification<RealMarking> {
         std::mutex run_res_mutex;
 
         std::vector<std::stack<RealMarking*>> traces;
+
+        std::vector<std::vector<Watch>> watchs;
+        std::vector<WatchAggregator> watch_aggrs;
 
 };
 

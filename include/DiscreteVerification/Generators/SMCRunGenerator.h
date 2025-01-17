@@ -74,6 +74,8 @@ namespace VerifyTAPN {
             std::stack<RealMarking*> getTrace() const;
 
             bool recordTrace = false;
+
+            unsigned int _thread_id = 0;
             
         protected:
         

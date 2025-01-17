@@ -13,6 +13,8 @@
 #include <PQL/Visitor.h>
 #include <iostream>
 
+#include "Core/TAPN/WatchExpression.hpp"
+
 namespace VerifyTAPN {
     namespace TAPN {
         class TimedArcPetriNet;
@@ -33,6 +35,8 @@ namespace VerifyTAPN {
             AST::ArithmeticExpression* get_a_result();
         public:
             TranslationVisitor(const TAPN::TimedArcPetriNet& net);
+
+            TAPN::Observable translateObservable(const unfoldtacpn::PQL::Observable& obs);
 
             std::unique_ptr<Query> translate(const unfoldtacpn::PQL::Condition& condition);
             void _accept(const unfoldtacpn::PQL::NotCondition *element) override;

@@ -23,7 +23,9 @@ namespace VerifyTAPN::SMC {
         Gamma,
         Erlang,
         DiscreteUniform,
-        Geometric
+        Geometric,
+        Triangular,
+        LogNormal
     };
 
     std::string distributionName(DistributionType type);
@@ -53,6 +55,15 @@ namespace VerifyTAPN::SMC {
     struct SMCGeometricParameters {
         double p;
     };
+    struct SMCTriangularParameters {
+        double a;
+        double b;
+        double c;
+    };
+    struct SMCLogNormalParameters {
+        double logMean;
+        double logStddev;
+    };
 
     union DistributionParameters {
         SMCUniformParameters uniform;
@@ -62,6 +73,8 @@ namespace VerifyTAPN::SMC {
         SMCGammaParameters gamma;
         SMCDiscreteUniformParameters discreteUniform;
         SMCGeometricParameters geometric;
+        SMCTriangularParameters triangular;
+        SMCLogNormalParameters logNormal;
     };
 
     struct Distribution {
@@ -94,6 +107,15 @@ namespace VerifyTAPN::SMC {
                 case Geometric:
                     date = std::geometric_distribution(parameters.geometric.p)(engine);
                     break;
+                case Triangular: {
+                        std::vector<double> points{parameters.triangular.a, parameters.triangular.c, parameters.triangular.c};
+                        std::vector<double> grad{0,1,0};
+                        date = std::piecewise_linear_distribution(points.begin(), points.end(), grad.begin())(engine);
+                    }
+                    break;
+                case LogNormal: 
+                    date = std::lognormal_distribution(parameters.logNormal.logMean, parameters.logNormal.logStddev)(engine);
+                    break;
             }
             if(precision > 0) {
                 double factor = pow(10.0, precision);
@@ -106,7 +128,7 @@ namespace VerifyTAPN::SMC {
 
         static Distribution defaultDistribution();
 
-        static Distribution fromParams(int distrib_id, double param1, double param2);
+        static Distribution fromParams(int distrib_id, std::vector<double> params);
 
         std::string toXML() const;
 

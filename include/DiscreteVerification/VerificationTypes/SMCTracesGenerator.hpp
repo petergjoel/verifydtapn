@@ -20,10 +20,21 @@ class SMCTracesGenerator : public SMCVerification {
         { }
 
         bool handleSuccessor(RealMarking* marking) override;
-        void handleRunResult(const bool res, int steps, double delay) override;
+        void handleRunResult(const bool res, int steps, double delay, unsigned int thread_id = 0) override;
         bool mustDoAnotherRun() override;
 
         void printResult() override;
+
+        void printWatchStats();
+
+        void handleTrace(const bool runRes, SMCRunGenerator* generator = nullptr) override;
+
+    private:
+
+        void saveWatchs(const unsigned int thread_id);
+        void clearWatchs(const unsigned int thread_id);
+
+        std::vector<std::vector<Watch>> savedWatchs;
 
 };
 

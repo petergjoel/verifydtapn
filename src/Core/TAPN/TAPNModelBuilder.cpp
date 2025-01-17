@@ -20,10 +20,10 @@ namespace VerifyTAPN {
     }
 
     void TAPNModelBuilder::addTransition(const std::string &name, int player, bool urgent,
-                                        double x, double y, int distrib_id, double param1, double param2, double weight, int intFiringMode)
+                                        double x, double y, int distrib_id, std::vector<double> params, double weight, int intFiringMode)
     {
         auto id = _transitions.size();
-        auto distrib = Distribution::fromParams(distrib_id, param1, param2);
+        auto distrib = Distribution::fromParams(distrib_id, params);
         SMC::FiringMode firingMode = static_cast<SMC::FiringMode>(intFiringMode);
         _transitions.emplace_back(new TimedTransition(id, name, name, urgent, player == 0, x, y, distrib, weight, firingMode));
     }

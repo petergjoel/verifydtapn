@@ -167,9 +167,13 @@ namespace VerifyTAPN::DiscreteVerification {
 
             inline double getPreviousDelay() const { return fromDelay; }
 
+            inline double getTotalAge() const { return totalAge; }
+
             inline void setPreviousDelay(const double delay) { this->fromDelay = delay; }
 
             bool enables(TAPN::TimedTransition* transition);
+
+            unsigned int _thread_id = 0;
 
         private:
 
@@ -178,6 +182,7 @@ namespace VerifyTAPN::DiscreteVerification {
 
             const TAPN::TimedTransition *generatedBy = nullptr;
             double fromDelay = 0.0;
+            double totalAge = 0.0;
 
             static RealTokenList emptyTokenList;
 

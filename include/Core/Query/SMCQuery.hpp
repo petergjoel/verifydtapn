@@ -3,6 +3,9 @@
 
 #include "AST.hpp"
 #include <PQL/SMCExpressions.h>
+#include "Core/TAPN/WatchExpression.hpp"
+
+using VerifyTAPN::TAPN::Observable;
 
 namespace VerifyTAPN::AST {
 
@@ -54,10 +57,16 @@ namespace VerifyTAPN::AST {
                 return smcSettings;
             }
 
+            std::vector<Observable>& getObservables() {
+                return observables;
+            }
+
         private:
             Quantifier quantifier;
             Expression *expr;
             SMCSettings smcSettings;
+            std::vector<Observable> observables;
+            
         };
 
 }

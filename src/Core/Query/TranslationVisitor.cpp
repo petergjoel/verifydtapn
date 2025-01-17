@@ -171,18 +171,33 @@ namespace VerifyTAPN {
             _result = std::make_unique<Query>(_is_synth ? Quantifier::CF : Quantifier::AF, get_e_result());
         }
 
+        Observable TranslationVisitor::translateObservable(const unfoldtacpn::PQL::Observable& obs) {
+            std::string name = std::get<0>(obs);
+            std::get<1>(obs)->visit(*this);
+            auto expr = get_a_result();
+            return std::make_pair(name, expr);
+        }
+
         void TranslationVisitor::_accept(const unfoldtacpn::PQL::PFCondition *condition) {
             check_first(true);
             SMCSettings settings = SMCSettings::fromPQL(condition->settings());
             (*condition)[0]->visit(*this);
-            _result = std::make_unique<SMCQuery>(Quantifier::PF, settings, get_e_result());            
+            auto smcQuery = new SMCQuery(Quantifier::PF, settings, get_e_result());
+            for(const auto& obs : condition->getObservables()) {
+                smcQuery->getObservables().push_back(translateObservable(obs));
+            }
+            _result = std::unique_ptr<SMCQuery>(smcQuery);
         }
 
         void TranslationVisitor::_accept(const unfoldtacpn::PQL::PGCondition *condition) {
             check_first(true);
             SMCSettings settings = SMCSettings::fromPQL(condition->settings());
             (*condition)[0]->visit(*this);
-            _result = std::make_unique<SMCQuery>(Quantifier::PG, settings, get_e_result());    
+            auto smcQuery = new SMCQuery(Quantifier::PG, settings, get_e_result());
+            for(const auto& obs : condition->getObservables()) {
+                smcQuery->getObservables().push_back(translateObservable(obs));
+            }
+            _result = std::unique_ptr<SMCQuery>(smcQuery); 
         }
 
         void TranslationVisitor::_accept(const unfoldtacpn::PQL::BooleanCondition *element) {

@@ -2,6 +2,7 @@
 #define PROBABILITYESTIMATION_HPP
 
 #include "DiscreteVerification/VerificationTypes/SMCVerification.hpp"
+#include "Core/TAPN/WatchExpression.hpp"
 
 namespace VerifyTAPN::DiscreteVerification {
 
@@ -20,7 +21,7 @@ class ProbabilityEstimation : public SMCVerification {
         { }
 
         bool handleSuccessor(RealMarking* marking) override;
-        void handleRunResult(const bool res, int steps, double delay) override;
+        void handleRunResult(const bool res, int steps, double delay, unsigned int thread_id = 0) override;
         bool mustDoAnotherRun() override;
 
         void prepare() override;
@@ -38,6 +39,8 @@ class ProbabilityEstimation : public SMCVerification {
         static void printRunsStats(const std::string category, unsigned long n, unsigned long totalSteps, double totalDelay, std::vector<int> perStep, std::vector<float> perDelay);
 
         void printCumulativeStats();
+
+        void printWatchStats();
 
         void printResult() override;
 
